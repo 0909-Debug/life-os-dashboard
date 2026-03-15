@@ -12,4 +12,4 @@ Features
 No login required. Works on mobile.
 
 Open here:
-https://github.com/0909-Debug/life-os-dashboard.git
+https://0909-debug.github.io/life-os-dashboard/
