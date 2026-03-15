@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Life OS Dashboard</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#0f172a;
+color:white;
+padding:12px;
+}
+
+h2{
+text-align:center;
+margin-bottom:10px;
+}
+
+.card{
+background:#1e293b;
+border-radius:10px;
+padding:12px;
+margin-bottom:15px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+font-size:12px;
+}
+
+th,td{
+border:1px solid #334155;
+padding:5px;
+text-align:center;
+}
+
+th{
+background:#facc15;
+color:black;
+}
+
+.habit{
+text-align:left;
+background:#020617;
+font-weight:bold;
+}
+
+input[type=checkbox]{
+transform:scale(1.2);
+}
+
+.progressbar{
+height:20px;
+background:#334155;
+border-radius:20px;
+margin-top:8px;
+}
+
+.bar{
+height:20px;
+width:0%;
+background:#22c55e;
+border-radius:20px;
+}
+
+.stats{
+display:flex;
+justify-content:space-between;
+margin-top:8px;
+}
+
+button{
+width:100%;
+padding:10px;
+border:none;
+border-radius:8px;
+margin-top:8px;
+font-size:16px;
+background:#ef4444;
+color:white;
+}
+
+.timer{
+font-size:40px;
+text-align:center;
+}
+
+textarea{
+width:100%;
+height:80px;
+border-radius:8px;
+border:none;
+padding:8px;
+margin-top:6px;
+}
+
+.goal{
+display:flex;
+gap:8px;
+margin-top:6px;
+}
+
+.goal input{
+flex:1;
+padding:6px;
+border-radius:6px;
+border:none;
+}
+
+.goal button{
+width:80px;
+background:#22c55e;
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>🧠 LIFE OPERATING SYSTEM</h2>
+
+<div class="card">
+
+<h3>Habit System</h3>
+
+<table id="habitTable"></table>
+
+<div class="progressbar">
+<div class="bar" id="bar"></div>
+</div>
+
+<div class="stats">
+<div>Progress: <span id="percent">0%</span></div>
+<div>Score: <span id="score">0</span>/100</div>
+</div>
+
+<button onclick="resetHabits()">Reset Habits</button>
+
+</div>
+
+
+<div class="card">
+
+<h3>Focus Timer</h3>
+
+<div class="timer" id="timer">25:00</div>
+
+<button onclick="startTimer()">Start Focus</button>
+
+</div>
+
+
+<div class="card">
+
+<h3>Goals</h3>
+
+<div class="goal">
+<input id="goalInput" placeholder="Enter goal">
+<button onclick="addGoal()">Add</button>
+</div>
+
+<ul id="goalList"></ul>
+
+</div>
+
+
+<div class="card">
+
+<h3>Daily Brain Dump</h3>
+
+<textarea id="notes" placeholder="Write ideas, thoughts, plans..."></textarea>
+
+</div>
+
+
+<script>
+
+const habits=[
+"Wake Up Early",
+"Morning Workout",
+"Deep Work",
+"No Porn",
+"Learning",
+"Offline Time"
+];
+
+const days=7;
+
+const table=document.getElementById("habitTable");
+
+let header="<tr><th>Habit</th>";
+
+for(let d=1;d<=days;d++){
+header+="<th>"+d+"</th>";
+}
+
+header+="</tr>";
+
+table.innerHTML=header;
+
+habits.forEach((habit,i)=>{
+
+let row="<tr>";
+
+row+='<td class="habit">'+habit+"</td>";
+
+for(let d=1;d<=days;d++){
+
+let id="h"+i+"d"+d;
+
+let saved=localStorage.getItem(id);
+
+row+='<td><input type="checkbox" id="'+id+'" '+(saved==="1"?"checked":"")+'></td>';
+
+}
+
+row+="</tr>";
+
+table.innerHTML+=row;
+
+});
+
+document.querySelectorAll("input[type=checkbox]").forEach(cb=>{
+
+cb.addEventListener("change",function(){
+
+localStorage.setItem(this.id,this.checked?1:0);
+
+updateStats();
+
+});
+
+});
+
+function updateStats(){
+
+let all=document.querySelectorAll("input[type=checkbox]");
+
+let checked=0;
+
+all.forEach(c=>{
+if(c.checked) checked++;
+});
+
+let percent=Math.round((checked/all.length)*100);
+
+document.getElementById("percent").innerText=percent+"%";
+
+document.getElementById("bar").style.width=percent+"%";
+
+document.getElementById("score").innerText=percent;
+
+}
+
+function resetHabits(){
+
+localStorage.clear();
+location.reload();
+
+}
+
+updateStats();
+
+
+let time=1500;
+let timerInterval;
+
+function startTimer(){
+
+if(timerInterval) return;
+
+timerInterval=setInterval(()=>{
+
+time--;
+
+let m=Math.floor(time/60);
+let s=time%60;
+
+document.getElementById("timer").innerText=
+(m<10?"0":"")+m+":"+(s<10?"0":"")+s;
+
+if(time<=0){
+
+clearInterval(timerInterval);
+alert("Focus Session Done");
+
+}
+
+},1000);
+
+}
+
+
+function addGoal(){
+
+let input=document.getElementById("goalInput");
+
+let goal=input.value;
+
+if(goal==="") return;
+
+let li=document.createElement("li");
+
+li.innerText=goal;
+
+document.getElementById("goalList").appendChild(li);
+
+input.value="";
+
+}
+
+document.getElementById("notes").value=
+localStorage.getItem("notes")||"";
+
+document.getElementById("notes").addEventListener("input",function(){
+
+localStorage.setItem("notes",this.value);
+
+});
+
+</script>
+
+</body>
+</html>
